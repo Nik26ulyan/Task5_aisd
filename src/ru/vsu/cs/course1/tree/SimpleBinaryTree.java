@@ -105,9 +105,9 @@ public class SimpleBinaryTree<T> implements BinaryTree<T> {
             iw.index++;
         }
         while (iw.index < bracketStr.length() && (
-                    quote && bracketStr.charAt(iw.index) != '"' ||
-                    !quote && !Character.isWhitespace(bracketStr.charAt(iw.index)) && "(),".indexOf(bracketStr.charAt(iw.index)) < 0
-               )) {
+                quote && bracketStr.charAt(iw.index) != '"' ||
+                        !quote && !Character.isWhitespace(bracketStr.charAt(iw.index)) && "(),".indexOf(bracketStr.charAt(iw.index)) < 0
+        )) {
             iw.index++;
         }
         if (quote && bracketStr.charAt(iw.index) == '"') {
@@ -157,33 +157,85 @@ public class SimpleBinaryTree<T> implements BinaryTree<T> {
 
     public SimpleBinaryTree cloneTree() {
         SimpleBinaryTree<T> cloneTree = new SimpleBinaryTree<>();
-        cloneTree.root = recursiveCloning(this.root, this.root);
+        cloneTree.root = recursiveCloning(this.root, cloneTree.root);
 
         return cloneTree;
     }
 
-    private SimpleTreeNode recursiveCloning(SimpleTreeNode root, SimpleTreeNode newR) {
-        if(root==null) {
-            return null;
+//    private SimpleTreeNode recursiveCloning(SimpleTreeNode root) {
+//        if (root.left != null) {
+//            newNode.left = new SimpleTreeNode();
+//            newNode.left.value = root.left.value;
+//            recursiveCloning(root.left, newNode.left);
+//        }
+//        if (root.right != null) {
+//            newNode.right = new SimpleTreeNode();
+//            newNode.right.value = root.right.value;
+//            recursiveCloning(root.right, newNode.right);
+//        }
+//
+//    }
+
+    private SimpleTreeNode recursiveCloning(SimpleTreeNode root, SimpleTreeNode newNode) {
+        SimpleTreeNode curNode = new SimpleTreeNode();
+
+        if (root.left == null && root.right == null) {
+            curNode.value = root.value;
+            return curNode;
+        }
+        if (root.left != null){
+            curNode.left = recursiveCloning(root.left, newNode);
+            curNode.value = root.value;
+        }
+        if (root.right != null){
+            curNode.right = recursiveCloning(root.right, newNode);
+            curNode.value = root.value;
         }
 
-        SimpleTreeNode leftSubNode=null;
-        SimpleTreeNode rightSubNode=null;
-
-        if(!(root.left==null)) {
-            leftSubNode = new SimpleTreeNode();
-            recursiveCloning(root.left, leftSubNode);
-        }
-
-        if(!(root.right ==null)) {
-            rightSubNode = new SimpleTreeNode();
-            recursiveCloning(root.right, rightSubNode);
-        }
-
-        newR.left=leftSubNode;
-        newR.right=rightSubNode;
-        newR.value=root.value;
-
-        return root;
+        return curNode;
     }
+
+//    private SimpleTreeNode recursiveCloning(SimpleTreeNode root, SimpleTreeNode newNode) {
+//        if (root == null) {
+//            return null;
+//        }
+//
+//        SimpleTreeNode leftSubNode = null;
+//        SimpleTreeNode rightSubNode = null;
+//
+//        if (!(root.left == null)) {
+//            leftSubNode = new SimpleTreeNode();
+//            leftSubNode.left = recursiveCloning(root.left, leftSubNode);
+//        }
+//
+//        if (!(root.right == null)) {
+//            rightSubNode = new SimpleTreeNode();
+//            rightSubNode.right = recursiveCloning(root.right, rightSubNode);
+//        }
+//
+//        newNode.left = leftSubNode;
+//        newNode.right = rightSubNode;
+//        newNode.value = root.value;
+//
+//        return newNode;
+//    }
+
+//    SimpleTreeNode curNode = new SimpleTreeNode();
+//
+//        if (root.left == null) {
+//        curNode.value = root.value;
+//        return curNode;
+//    } else {
+//        curNode.left = recursiveCloning(root.left, newNode);
+//        curNode.value = root.value;
+//    }
+//
+//        if (root.right == null) {
+//        return curNode;
+//    } else {
+//        curNode.right = recursiveCloning(root.right, newNode);
+//        curNode.value = root.value;
+//    }
+//
+//        return curNode;
 }

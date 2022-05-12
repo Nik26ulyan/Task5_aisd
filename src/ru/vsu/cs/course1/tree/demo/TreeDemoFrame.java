@@ -201,8 +201,8 @@ public class TreeDemoFrame extends JFrame {
             });
         });
         buttonClone.addActionListener(e -> {
-            SimpleBinaryTree<Integer> tree = (SimpleBinaryTree<Integer>) this.tree;
-            this.tree = tree.cloneTree();
+            this.tree = this.tree.cloneTree();
+            repaintTree();
         });
     }
 
