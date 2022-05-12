@@ -8,6 +8,7 @@ import java.util.function.Function;
 public class SimpleBinaryTree<T> implements BinaryTree<T> {
 
     protected class SimpleTreeNode implements BinaryTree.TreeNode<T> {
+
         public T value;
         public SimpleTreeNode left;
         public SimpleTreeNode right;
@@ -16,6 +17,9 @@ public class SimpleBinaryTree<T> implements BinaryTree<T> {
             this.value = value;
             this.left = left;
             this.right = right;
+        }
+
+        public SimpleTreeNode() {
         }
 
         public SimpleTreeNode(T value) {
@@ -149,5 +153,37 @@ public class SimpleBinaryTree<T> implements BinaryTree<T> {
             throw new Exception(String.format("Ожидался конец строки [%d]", iw.index));
         }
         this.root = root;
+    }
+
+    public SimpleBinaryTree cloneTree() {
+        SimpleBinaryTree<T> cloneTree = new SimpleBinaryTree<>();
+        cloneTree.root = recursiveCloning(this.root, this.root);
+
+        return cloneTree;
+    }
+
+    private SimpleTreeNode recursiveCloning(SimpleTreeNode root, SimpleTreeNode newR) {
+        if(root==null) {
+            return null;
+        }
+
+        SimpleTreeNode leftSubNode=null;
+        SimpleTreeNode rightSubNode=null;
+
+        if(!(root.left==null)) {
+            leftSubNode = new SimpleTreeNode();
+            recursiveCloning(root.left, leftSubNode);
+        }
+
+        if(!(root.right ==null)) {
+            rightSubNode = new SimpleTreeNode();
+            recursiveCloning(root.right, rightSubNode);
+        }
+
+        newR.left=leftSubNode;
+        newR.right=rightSubNode;
+        newR.value=root.value;
+
+        return root;
     }
 }

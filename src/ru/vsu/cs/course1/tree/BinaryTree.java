@@ -72,6 +72,8 @@ public interface BinaryTree<T> extends Iterable<T> {
      */
     TreeNode<T> getRoot();
 
+    SimpleBinaryTree<T> cloneTree();
+
 
     /**
      * Реализация Iterable&lt;T&gt;
