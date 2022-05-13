@@ -156,25 +156,14 @@ public class SimpleBinaryTree<T> implements BinaryTree<T> {
     }
 
     public SimpleBinaryTree cloneTree() {
-        SimpleBinaryTree<T> cloneTree = new SimpleBinaryTree<>();
-        cloneTree.root = recursiveCloning(this.root, cloneTree.root);
-
-        return cloneTree;
+        if (this.root == null) {
+            return this;
+        } else {
+            SimpleBinaryTree<T> cloneTree = new SimpleBinaryTree<>();
+            cloneTree.root = recursiveCloning(this.root, cloneTree.root);
+            return cloneTree;
+        }
     }
-
-//    private SimpleTreeNode recursiveCloning(SimpleTreeNode root) {
-//        if (root.left != null) {
-//            newNode.left = new SimpleTreeNode();
-//            newNode.left.value = root.left.value;
-//            recursiveCloning(root.left, newNode.left);
-//        }
-//        if (root.right != null) {
-//            newNode.right = new SimpleTreeNode();
-//            newNode.right.value = root.right.value;
-//            recursiveCloning(root.right, newNode.right);
-//        }
-//
-//    }
 
     private SimpleTreeNode recursiveCloning(SimpleTreeNode root, SimpleTreeNode newNode) {
         SimpleTreeNode curNode = new SimpleTreeNode();
@@ -194,48 +183,4 @@ public class SimpleBinaryTree<T> implements BinaryTree<T> {
 
         return curNode;
     }
-
-//    private SimpleTreeNode recursiveCloning(SimpleTreeNode root, SimpleTreeNode newNode) {
-//        if (root == null) {
-//            return null;
-//        }
-//
-//        SimpleTreeNode leftSubNode = null;
-//        SimpleTreeNode rightSubNode = null;
-//
-//        if (!(root.left == null)) {
-//            leftSubNode = new SimpleTreeNode();
-//            leftSubNode.left = recursiveCloning(root.left, leftSubNode);
-//        }
-//
-//        if (!(root.right == null)) {
-//            rightSubNode = new SimpleTreeNode();
-//            rightSubNode.right = recursiveCloning(root.right, rightSubNode);
-//        }
-//
-//        newNode.left = leftSubNode;
-//        newNode.right = rightSubNode;
-//        newNode.value = root.value;
-//
-//        return newNode;
-//    }
-
-//    SimpleTreeNode curNode = new SimpleTreeNode();
-//
-//        if (root.left == null) {
-//        curNode.value = root.value;
-//        return curNode;
-//    } else {
-//        curNode.left = recursiveCloning(root.left, newNode);
-//        curNode.value = root.value;
-//    }
-//
-//        if (root.right == null) {
-//        return curNode;
-//    } else {
-//        curNode.right = recursiveCloning(root.right, newNode);
-//        curNode.value = root.value;
-//    }
-//
-//        return curNode;
 }

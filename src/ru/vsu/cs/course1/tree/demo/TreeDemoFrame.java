@@ -27,26 +27,14 @@ public class TreeDemoFrame extends JFrame {
     private JTextArea textAreaSystemOut;
     private JTextField textFieldBracketNotationTree;
     private JButton buttonMakeTree;
-    private JButton buttonMakeBSTree;
     private JSplitPane splitPaneMain;
-    private JTextField textFieldValues;
-    private JSpinner spinnerRandomCount;
-    private JButton buttonRandomGenerate;
-    private JButton buttonSortValues;
-    private JButton buttonMakeBSTree2;
-    private JButton buttonMakeAVLTree;
-    private JButton buttonMakeRBTree;
-    private JTextField textFieldSingleValue;
-    private JButton buttonAddValue;
-    private JButton buttonRemoveValue;
     private JPanel panelPaintArea;
     private JButton buttonSaveImage;
-    private JButton buttonToBracketNotation;
     private JCheckBox checkBoxTransparent;
-    private JSpinner spinnerSingleValue;
     private JButton buttonClone;
+    private JPanel panelPaintClone;
 
-    private JMenuBar menuBarMain;
+    private JPanel paintClone = null;
     private JPanel paintPanel = null;
     private JFileChooser fileChooserSave;
 
@@ -75,8 +63,25 @@ public class TreeDemoFrame extends JFrame {
                 }
             }
         };
+
+        paintClone = new JPanel() {
+            private Dimension paintSize = new Dimension(0, 0);
+
+            @Override
+            public void paintComponent(Graphics gr) {
+                super.paintComponent(gr);
+                paintSize = BinaryTreePainter.paint(tree.cloneTree(), gr);
+                if (!paintSize.equals(this.getPreferredSize())) {
+                    SwingUtils.setFixedSize(this, paintSize.width, paintSize.height);
+                }
+            }
+        };
+
         JScrollPane paintJScrollPane = new JScrollPane(paintPanel);
         panelPaintArea.add(paintJScrollPane);
+
+        JScrollPane paintCloneJScrollPane = new JScrollPane(paintClone);
+        panelPaintClone.add(paintCloneJScrollPane);
 
         fileChooserSave = new JFileChooser();
         fileChooserSave.setCurrentDirectory(new File("./images"));
@@ -86,8 +91,6 @@ public class TreeDemoFrame extends JFrame {
         fileChooserSave.setDialogType(JFileChooser.SAVE_DIALOG);
         fileChooserSave.setApproveButtonText("Save");
 
-        spinnerRandomCount.setValue(30);
-        spinnerSingleValue.setValue(10);
 
         buttonMakeTree.addActionListener(actionEvent -> {
             try {
@@ -101,26 +104,6 @@ public class TreeDemoFrame extends JFrame {
         });
 
 
-        buttonRandomGenerate.addActionListener(actionEvent -> {
-            int size = ((Integer) spinnerRandomCount.getValue()).intValue();
-            int[] arr = ArrayUtils.createRandomIntArray(size, (size <= 50) ? 100 : 1000);
-            textFieldValues.setText(ArrayUtils.toString(arr));
-        });
-        buttonSortValues.addActionListener(actionEvent -> {
-            try {
-                int[] arr = ArrayUtils.toIntArray(textFieldValues.getText());
-                Arrays.sort(arr);
-                textFieldValues.setText(ArrayUtils.toString(arr));
-            } catch (Exception ex) {
-                SwingUtils.showErrorMessageBox(ex);
-            }
-        });
-        buttonToBracketNotation.addActionListener(actionEvent -> {
-            if (tree == null) {
-                return;
-            }
-            textFieldBracketNotationTree.setText(tree.toBracketStr());
-        });
         buttonSaveImage.addActionListener(actionEvent -> {
             if (tree == null) {
                 return;
@@ -144,16 +127,6 @@ public class TreeDemoFrame extends JFrame {
                 BinaryTreeAlgorithms.preOrderVisit(tree.getRoot(), (value, level) -> {
                     System.out.println(value + " (уровень " + level + ")");
                 });
-                /*
-                // эквивалентная запись без лямбда-выражений
-                class InnerVisitor implements BinaryTreeAlgorithms.Visitor<Integer> {
-                    @Override
-                    public void visit(Integer value, int level) {
-                        System.out.println(value + " (уровень " + level + ")");
-                    }
-                }
-                BinaryTreeAlgorithms.preOrderVisit(tree.getRoot(), new InnerVisitor());
-                */
                 System.out.println();
                 System.out.println("Итератор:");
                 for (Integer i : BinaryTreeAlgorithms.preOrderValues(tree.getRoot())) {
@@ -202,7 +175,7 @@ public class TreeDemoFrame extends JFrame {
         });
         buttonClone.addActionListener(e -> {
             this.tree = this.tree.cloneTree();
-            repaintTree();
+            paintClone.repaint();
         });
     }
 
@@ -255,7 +228,7 @@ public class TreeDemoFrame extends JFrame {
         splitPaneMain = new JSplitPane();
         panelMain.add(splitPaneMain, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(4, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
         splitPaneMain.setLeftComponent(panel1);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(3, 3, new Insets(0, 0, 0, 0), -1, -1));
@@ -272,67 +245,47 @@ public class TreeDemoFrame extends JFrame {
         final Spacer spacer1 = new Spacer();
         panel2.add(spacer1, new GridConstraints(2, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(4, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
         panel1.add(panel3, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        textFieldValues = new JTextField();
-        textFieldValues.setText("6, 8, 3, 5, 7, 2, 16, 1, 15, 12, 9");
-        panel3.add(textFieldValues, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayoutManager(1, 5, new Insets(0, 0, 0, 0), -1, -1));
-        panel3.add(panel4, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        spinnerRandomCount = new JSpinner();
-        panel4.add(spinnerRandomCount, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(80, -1), new Dimension(80, -1), new Dimension(80, -1), 0, false));
-        buttonRandomGenerate = new JButton();
-        buttonRandomGenerate.setText("Сгенерировать");
-        panel4.add(buttonRandomGenerate, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonSortValues = new JButton();
-        buttonSortValues.setText("Упорядочить");
-        panel4.add(buttonSortValues, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.add(panel4, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
-        panel4.add(spacer2, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        final JLabel label2 = new JLabel();
-        label2.setText("cлучайных чисел");
-        panel4.add(label2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(spacer2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panel3.add(panel5, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel3.add(panel5, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final Spacer spacer3 = new Spacer();
         panel5.add(spacer3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final JPanel panel6 = new JPanel();
-        panel6.setLayout(new GridLayoutManager(1, 5, new Insets(0, 0, 0, 0), -1, -1));
-        panel3.add(panel6, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel6.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.add(panel6, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final Spacer spacer4 = new Spacer();
-        panel6.add(spacer4, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        buttonAddValue = new JButton();
-        buttonAddValue.setText("Добавить");
-        panel6.add(buttonAddValue, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonRemoveValue = new JButton();
-        buttonRemoveValue.setText("Удалить");
-        panel6.add(buttonRemoveValue, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        spinnerSingleValue = new JSpinner();
-        panel6.add(spinnerSingleValue, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(80, -1), new Dimension(80, -1), new Dimension(80, -1), 0, false));
+        panel6.add(spacer4, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         buttonClone = new JButton();
         buttonClone.setText("Выполнить клонирование");
-        panel6.add(buttonClone, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel6.add(buttonClone, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         panelPaintArea = new JPanel();
         panelPaintArea.setLayout(new BorderLayout(0, 0));
         panel1.add(panelPaintArea, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final Spacer spacer5 = new Spacer();
         panelPaintArea.add(spacer5, BorderLayout.CENTER);
         final JPanel panel7 = new JPanel();
-        panel7.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
+        panel7.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
         panel1.add(panel7, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         buttonSaveImage = new JButton();
         buttonSaveImage.setText("Сохранить изображение в SVG");
-        panel7.add(buttonSaveImage, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonToBracketNotation = new JButton();
-        buttonToBracketNotation.setText("В скобочное представление");
-        panel7.add(buttonToBracketNotation, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel7.add(buttonSaveImage, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer6 = new Spacer();
-        panel7.add(spacer6, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        panel7.add(spacer6, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         checkBoxTransparent = new JCheckBox();
         checkBoxTransparent.setText("прозрачность");
-        panel7.add(checkBoxTransparent, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel7.add(checkBoxTransparent, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelPaintClone = new JPanel();
+        panelPaintClone.setLayout(new BorderLayout(0, 0));
+        panel1.add(panelPaintClone, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final Spacer spacer7 = new Spacer();
+        panelPaintClone.add(spacer7, BorderLayout.CENTER);
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new GridLayoutManager(5, 1, new Insets(0, 0, 0, 0), -1, -1));
         splitPaneMain.setRightComponent(panel8);
